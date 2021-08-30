@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
-import { createUser } from '../utils/API';
+import { useMutation } from '@apollo/client';
+import { CREATE_USER } from '../utils/mutations';
+
 import Auth from '../utils/auth';
 
+// import { createUser } from '../utils/API';
+
 const SignupForm = () => {
+
+  const [createUser, { error, data }] = useMutation(CREATE_USER);
+
   // set initial form state
   const [userFormData, setUserFormData] = useState({ username: '', email: '', password: '' });
   // set state for form validation
@@ -28,8 +35,9 @@ const SignupForm = () => {
     }
 
     try {
+      console.log(userFormData)
       const response = await createUser(userFormData);
-
+      console.log(response);
       if (!response.ok) {
         throw new Error('something went wrong!');
       }
