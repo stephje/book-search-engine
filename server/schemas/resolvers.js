@@ -42,6 +42,16 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
+    saveBook: async (parent, { bookData }, context) => {
+      if (context.user) {
+        const updatedUserData = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { savedBooks: bookData } }
+        );
+        return updatedUserData;
+      }
+      throw new AuthenticationError('Please log in first!');
+    },
   },
 };
 
