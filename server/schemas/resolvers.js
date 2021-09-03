@@ -27,9 +27,7 @@ const resolvers = {
   Mutation: {
     createUser: async (parent, { username, email, password }) => {
       const user = await User.create({ username, email, password });
-      console.log("user", user);
       const token = signToken(user);
-      console.log("token", token);
       return { token, user };
     },
     login: async (parent, { email, password }) => {
@@ -42,12 +40,9 @@ const resolvers = {
         throw new AuthenticationError("Incorrect credentials");
       }
       const token = signToken(user);
-      console.log("token inside resolver", token)
       return { token, user };
     },
-    saveBook: async (parent, { bookData }, context) => {
-      console.log("bookData", bookData);
-      console.log("context", context);
+    saveBook: async (parent, bookData, context) => {
       if (context.user) {
         const updatedUserData = await User.findOneAndUpdate(
           { _id: context.user._id },
@@ -55,14 +50,15 @@ const resolvers = {
           // new: true ensures that the modified document is returned
           { new: true }
         );
-        return updatedUserData;
+        const responseObject = { _id: updatedUserData._id, username: updatedUserData.username, email: updatedUserData.email, savedBooks: updatedUserData.savedBooks }
+        return responseObject;
       }
       throw new AuthenticationError('Please log in first!');
     },
     deleteBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        return Book.findOneAndUpdate(
-          { _id: bookId },
+        return User.findOneAndUpdate(
+          { _id: context.user._id },
           {
             //$pull is used to remove something from an array
             $pull: {

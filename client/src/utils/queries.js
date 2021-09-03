@@ -11,12 +11,8 @@ export const GET_ME = gql`
         authors
         description
         image
-        link
         title
       }
     }
   }
 `;
-
-// export const SEARCH_GOOGLE_BOOKS = gql `
-// `;
