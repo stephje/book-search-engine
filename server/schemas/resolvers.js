@@ -46,13 +46,31 @@ const resolvers = {
       if (context.user) {
         const updatedUserData = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { savedBooks: bookData } }
+          { $addToSet: { savedBooks: bookData } },
+          // new: true ensures that the modified document is returned
+          { new: true }
         );
         return updatedUserData;
       }
       throw new AuthenticationError('Please log in first!');
     },
+    deleteBook: async (parent, { bookID }, context) => {
+      if (context.user) {
+        return Book.findOneAndUpdate(
+          { _id: bookID },
+          {
+            //$pull is used to remove something from an array
+            $pull: {
+              savedBooks: { bookID },
+            },
+          },
+          // new: true ensures that the modified document is returned
+          { new: true }
+        );
+      }
+    }
   },
+
 };
 
 module.exports = resolvers;
